@@ -100,7 +100,7 @@ const PipelineUIInner = () => {
                 });
 
                 const nodeID = getNodeID(type);
-                console.log(nodeID)
+                console.log(nodeID);
                 const newNode = {
                     id: nodeID,
                     type,
