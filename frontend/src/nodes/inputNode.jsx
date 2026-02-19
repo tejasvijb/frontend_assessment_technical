@@ -5,11 +5,12 @@ import { createNode, createHandle, createField } from "./nodeFactory";
 import * as FieldComponents from "./fieldComponents";
 import useWorkflowStore from "../store/workflowStore";
 import { Zap, Settings, Lightbulb } from "lucide-react";
+import React from "react";
 
 console.log(FieldComponents);
 
 // Custom InputNode component with styled design
-const CustomInputNodeComponent = ({
+const CustomInputNodeComponent = React.memo(({
     id,
     data,
     fields,
@@ -80,7 +81,7 @@ const CustomInputNodeComponent = ({
             </div>
         </div>
     );
-};
+});
 
 const inputNodeConfig = {
     type: "customInput",

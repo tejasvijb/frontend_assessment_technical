@@ -52,7 +52,7 @@ export function createNode(config) {
         ...styling,
     };
 
-    return function NodeComponent({ id, data }) {
+    const NodeComponent = ({ id, data }) => {
         // Initialize state from data or use defaults
         const [fieldValues, setFieldValues] = useState(() => {
             const initial = {};
@@ -196,6 +196,10 @@ export function createNode(config) {
             </div>
         );
     };
+
+    NodeComponent.displayName = `Node(${label})`;
+
+    return React.memo(NodeComponent);
 }
 
 /**
