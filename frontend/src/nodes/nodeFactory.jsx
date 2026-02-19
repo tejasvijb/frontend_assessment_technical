@@ -41,6 +41,7 @@ export function createNode(config) {
         fieldComponents = {},
         styling = {},
         color = "input",
+        customComponent: CustomComponent = null,
         updateStore = null,
     } = config;
 
@@ -73,6 +74,63 @@ export function createNode(config) {
                 updateStore(id, fieldName, newValue);
             }
         };
+
+        // Render handle
+        const renderHandle = (handleConfig, nodeId, index, handlesList) => {
+            const position =
+                handleConfig.position === "left"
+                    ? Position.Left
+                    : handleConfig.position === "right"
+                      ? Position.Right
+                      : handleConfig.position === "top"
+                        ? Position.Top
+                        : Position.Bottom;
+
+            const handleType = handlesList.targets.includes(handleConfig)
+                ? "target"
+                : "source";
+            const style = {};
+            if (handleConfig.top) {
+                style.top = handleConfig.top;
+            }
+
+            return (
+                <Handle
+                    key={`${nodeId}-${handleConfig.id}`}
+                    type={handleType}
+                    position={position}
+                    id={`${nodeId}-${handleConfig.id}`}
+                    style={style}
+                />
+            );
+        };
+
+        // If custom component provided, use it
+        if (CustomComponent) {
+            return (
+                <div>
+                    {/* Render target handles (inputs) */}
+                    {handles.targets.map((h, idx) =>
+                        renderHandle(h, id, idx, handles),
+                    )}
+
+                    {/* Custom component */}
+                    <CustomComponent
+                        id={id}
+                        data={data}
+                        fields={fields}
+                        fieldValues={fieldValues}
+                        handleFieldChange={handleFieldChange}
+                        fieldComponents={fieldComponents}
+                    />
+
+                    {/* Render source handles (outputs) */}
+                    {handles.sources.map((h, idx) =>
+                        renderHandle(h, id, idx, handles),
+                    )}
+                </div>
+            );
+        }
 
         // Render a single field based on its type
         const renderField = (field) => {
@@ -108,40 +166,12 @@ export function createNode(config) {
             );
         };
 
-        // Render handle
-        const renderHandle = (handleConfig, index) => {
-            const position =
-                handleConfig.position === "left"
-                    ? Position.Left
-                    : handleConfig.position === "right"
-                      ? Position.Right
-                      : handleConfig.position === "top"
-                        ? Position.Top
-                        : Position.Bottom;
-
-            const handleType = handles.targets.includes(handleConfig)
-                ? "target"
-                : "source";
-            const style = {};
-            if (handleConfig.top) {
-                style.top = handleConfig.top;
-            }
-
-            return (
-                <Handle
-                    key={`${id}-${handleConfig.id}`}
-                    type={handleType}
-                    position={position}
-                    id={`${id}-${handleConfig.id}`}
-                    style={style}
-                />
-            );
-        };
-
         return (
             <div style={finalStyle}>
                 {/* Render target handles (inputs) */}
-                {handles.targets.map((h, idx) => renderHandle(h, idx))}
+                {handles.targets.map((h, idx) =>
+                    renderHandle(h, id, idx, handles),
+                )}
 
                 {/* Node header/label */}
                 <div
@@ -160,7 +190,9 @@ export function createNode(config) {
                 </div>
 
                 {/* Render source handles (outputs) */}
-                {handles.sources.map((h, idx) => renderHandle(h, idx))}
+                {handles.sources.map((h, idx) =>
+                    renderHandle(h, id, idx, handles),
+                )}
             </div>
         );
     };
