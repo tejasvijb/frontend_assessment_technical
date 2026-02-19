@@ -28,6 +28,7 @@ import { DEFAULT_STYLE, DEFAULT_NODE_COLORS } from "./nodeConstants";
  *     styling?: Object,                // Override default styling
  *     color?: string,                  // Background color key
  *     updateStore?: Function           // Callback to persist state to store (id, fieldName, value)
+ *     children?: React components or render function for custom node content
  *   }
  *
  * Returns: React functional component
