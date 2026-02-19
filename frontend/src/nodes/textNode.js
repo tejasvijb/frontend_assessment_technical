@@ -1,35 +1,25 @@
 // textNode.js
+// Text node created with the factory pattern
 
-import { useState } from "react";
-import { Handle, Position } from "@xyflow/react";
+import { createNode, createHandle, createField } from "./nodeFactory";
+import * as FieldComponents from "./fieldComponents";
+import useWorkflowStore from "../store/workflowStore";
 
-export const TextNode = ({ id, data }) => {
-    const [currText, setCurrText] = useState(data?.text || "{{input}}");
-
-    const handleTextChange = (e) => {
-        setCurrText(e.target.value);
-    };
-
-    return (
-        <div style={{ width: 200, height: 80, border: "1px solid black" }}>
-            <div>
-                <span>Text</span>
-            </div>
-            <div>
-                <label>
-                    Text:
-                    <input
-                        type="text"
-                        value={currText}
-                        onChange={handleTextChange}
-                    />
-                </label>
-            </div>
-            <Handle
-                type="source"
-                position={Position.Right}
-                id={`${id}-output`}
-            />
-        </div>
-    );
+const textNodeConfig = {
+    type: "text",
+    label: "Text",
+    handles: {
+        targets: [],
+        sources: [createHandle("output", "right")],
+    },
+    fields: [
+        createField("TextAreaField", "text", "Text", "{{input}}", null, { rows: 2 }),
+    ],
+    fieldComponents: FieldComponents,
+    color: "text",
+    updateStore: (nodeId, fieldName, value) => {
+        useWorkflowStore.getState().updateNodeData(nodeId, fieldName, value);
+    },
 };
+
+export const TextNode = createNode(textNodeConfig);

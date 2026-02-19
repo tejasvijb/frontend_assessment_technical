@@ -2,7 +2,7 @@
 // Displays the drag-and-drop UI
 // --------------------------------------------------
 
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import {
     ReactFlow,
     Background,
@@ -18,7 +18,8 @@ import { InputNode } from "./nodes/inputNode";
 import { LLMNode } from "./nodes/llmNode";
 import { OutputNode } from "./nodes/outputNode";
 import { TextNode } from "./nodes/textNode";
-import  useWorkflowStore  from "./store/workflowStore";
+import { ImagePreviewNode } from "./nodes/imagePreviewNode";
+import useWorkflowStore from "./store/workflowStore";
 import { useShallow } from "zustand/shallow";
 
 import "@xyflow/react/dist/style.css";
@@ -30,21 +31,34 @@ const nodeTypes = {
     llm: LLMNode,
     customOutput: OutputNode,
     text: TextNode,
+    imagePreview: ImagePreviewNode,
 };
 
 const workflowSelector = (state) => ({
     getNodeID: state.getNodeID,
+    setNodes: state.setNodes,
+    setEdges: state.setEdges,
 });
-
 
 const PipelineUIInner = () => {
     const reactFlowWrapper = useRef(null);
     const { screenToFlowPosition } = useReactFlow();
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const {getNodeID} = useWorkflowStore(useShallow(workflowSelector));
+    const {
+        getNodeID,
+        setNodes: setWorkflowNodes,
+        setEdges: setWorkflowEdges,
+    } = useWorkflowStore(useShallow(workflowSelector));
 
-  
+    useEffect(() => {
+        setWorkflowNodes(nodes);
+    }, [nodes, setWorkflowNodes]);
+
+    useEffect(() => {
+        setWorkflowEdges(edges);
+    }, [edges, setWorkflowEdges]);
+
     const onConnect = useCallback(
         (connection) => {
             setEdges((eds) => {
@@ -84,6 +98,7 @@ const PipelineUIInner = () => {
                 });
 
                 const nodeID = getNodeID(type);
+                console.log(nodeID)
                 const newNode = {
                     id: nodeID,
                     type,
@@ -92,7 +107,6 @@ const PipelineUIInner = () => {
                 };
 
                 setNodes((nds) => nds.concat(newNode));
-
             }
         },
         [screenToFlowPosition, getNodeID, setNodes],
@@ -131,7 +145,6 @@ const PipelineUIInner = () => {
         </>
     );
 };
-
 
 export const PipelineUI = () => (
     <ReactFlowProvider>

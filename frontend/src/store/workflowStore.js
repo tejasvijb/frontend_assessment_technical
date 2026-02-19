@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { addEdge, applyNodeChanges, applyEdgeChanges } from "@xyflow/react";
 
-
 const MAX_LOGS_PER_NODE = 100;
 
 // this is our useStore hook that we can use in our components to get parts of the store and call actions
@@ -14,6 +13,8 @@ const useWorkflowStore = create((set, get) => ({
     workflowId: undefined,
     executionStartTime: undefined,
     isExecuting: false,
+    setNodes: (nodes) => set({ nodes }),
+    setEdges: (edges) => set({ edges }),
 
     // Graph manipulation
     onNodesChange: (changes) => {
@@ -126,6 +127,24 @@ const useWorkflowStore = create((set, get) => ({
 
     setExecutionStartTime: (time) => {
         set({ executionStartTime: time });
+    },
+
+    // Update node data and persist to store
+    updateNodeData: (nodeId, fieldName, fieldValue) => {
+        set({
+            nodes: get().nodes.map((node) => {
+                if (node.id === nodeId) {
+                    return {
+                        ...node,
+                        data: {
+                            ...node.data,
+                            [fieldName]: fieldValue,
+                        },
+                    };
+                }
+                return node;
+            }),
+        });
     },
 }));
 

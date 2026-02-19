@@ -1,47 +1,29 @@
 // outputNode.js
+// Output node created with the factory pattern
 
-import { useState } from 'react';
-import { Handle, Position } from '@xyflow/react';
+import { createNode, createHandle, createField } from "./nodeFactory";
+import * as FieldComponents from "./fieldComponents";
+import useWorkflowStore from "../store/workflowStore";
 
-export const OutputNode = ({ id, data }) => {
-  const [currName, setCurrName] = useState(data?.outputName || id.replace('customOutput-', 'output_'));
-  const [outputType, setOutputType] = useState(data.outputType || 'Text');
+const outputNodeConfig = {
+    type: "customOutput",
+    label: "Output",
+    handles: {
+        targets: [createHandle("value", "left")],
+        sources: [],
+    },
+    fields: [
+        createField("TextField", "outputName", "Name", "output_1"),
+        createField("SelectField", "outputType", "Type", "Text", [
+            { value: "Text", label: "Text" },
+            { value: "Image", label: "Image" },
+        ]),
+    ],
+    fieldComponents: FieldComponents,
+    color: "output",
+    updateStore: (nodeId, fieldName, value) => {
+        useWorkflowStore.getState().updateNodeData(nodeId, fieldName, value);
+    },
+};
 
-  const handleNameChange = (e) => {
-    setCurrName(e.target.value);
-  };
-
-  const handleTypeChange = (e) => {
-    setOutputType(e.target.value);
-  };
-
-  return (
-    <div style={{width: 200, height: 80, border: '1px solid black'}}>
-      <Handle
-        type="target"
-        position={Position.Left}
-        id={`${id}-value`}
-      />
-      <div>
-        <span>Output</span>
-      </div>
-      <div>
-        <label>
-          Name:
-          <input 
-            type="text" 
-            value={currName} 
-            onChange={handleNameChange} 
-          />
-        </label>
-        <label>
-          Type:
-          <select value={outputType} onChange={handleTypeChange}>
-            <option value="Text">Text</option>
-            <option value="File">Image</option>
-          </select>
-        </label>
-      </div>
-    </div>
-  );
-}
+export const OutputNode = createNode(outputNodeConfig);
