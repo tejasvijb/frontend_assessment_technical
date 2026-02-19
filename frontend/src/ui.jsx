@@ -66,7 +66,7 @@ const PipelineUIInner = () => {
             setEdges((eds) => {
                 const newEdges = [
                     ...eds,
-                    { ...connection, type: "smoothstep", animated: true },
+                    { ...connection, type: "smoothstep", animated: true, key: `${connection.source}-${connection.sourceHandle}-${connection.target}-${connection.targetHandle}` },
                 ];
                 return newEdges;
             });
