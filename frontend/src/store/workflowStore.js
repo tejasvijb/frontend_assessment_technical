@@ -45,7 +45,7 @@ const useWorkflowStore = create((set, get) => ({
         }
         newIDs[type] += 1;
         set({ nodeIDs: newIDs });
-        return `${type}-${newIDs[type]}`;
+        return `${type}_${newIDs[type]}`;
     },
 
     // Add node to graph
