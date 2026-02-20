@@ -60,8 +60,8 @@ const PipelineUIInner = () => {
     const nodes = useWorkflowStore((state) => state.nodes);
     const edges = useWorkflowStore((state) => state.edges);
 
-    // console.log("nodes, edges", nodes, edges)
-    // console.log("selectedNode", selectedNode)
+    console.log("nodes, edges", nodes, edges)
+    console.log("selectedNode", selectedNode)
 
     const onConnect = useCallback(
         (params) => {
@@ -72,7 +72,7 @@ const PipelineUIInner = () => {
     );
 
     const getInitNodeData = (nodeID, type) => {
-        let nodeData = { id: nodeID, nodeType: `${type}` };
+        let nodeData = { id: nodeID, nodeType: `${type}`, name: nodeID };
         return nodeData;
     };
 

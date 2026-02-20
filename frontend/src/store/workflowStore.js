@@ -139,20 +139,32 @@ const useWorkflowStore = create((set, get) => ({
 
     // Update node data and persist to store
     updateNodeData: (nodeId, fieldName, fieldValue) => {
-        set({
-            nodes: get().nodes.map((node) => {
-                if (node.id === nodeId) {
-                    return {
-                        ...node,
-                        data: {
-                            ...node.data,
-                            [fieldName]: fieldValue,
-                        },
-                    };
-                }
-                return node;
-            }),
+        const updatedNodes = get().nodes.map((node) => {
+            if (node.id === nodeId) {
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        [fieldName]: fieldValue,
+                    },
+                };
+            }
+            return node;
         });
+
+        const updatedNode = updatedNodes.find((node) => node.id === nodeId);
+        const newState = { nodes: updatedNodes };
+
+        // Update selectedNode if it's the node being updated
+        if (
+            get().selectedNode &&
+            get().selectedNode.id === nodeId &&
+            updatedNode
+        ) {
+            newState.selectedNode = updatedNode;
+        }
+
+        set(newState);
     },
 }));
 
