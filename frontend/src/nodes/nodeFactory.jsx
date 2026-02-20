@@ -43,6 +43,8 @@ export function createNode(config) {
         color = "input",
         customComponent: CustomComponent = null,
         updateStore = null,
+        width = null,
+        height = null,
     } = config;
 
     const finalStyle = {
@@ -89,10 +91,7 @@ export function createNode(config) {
             const handleType = handlesList.targets.includes(handleConfig)
                 ? "target"
                 : "source";
-            const style = {};
-            if (handleConfig.top) {
-                style.top = handleConfig.top;
-            }
+            const style = handleConfig.top ? { top: handleConfig.top } : {};
 
             return (
                 <Handle
@@ -108,9 +107,11 @@ export function createNode(config) {
         // If custom component provided, use it
         if (CustomComponent) {
             return (
-                 <div className={`rounded-md border-3 ${
-                selected ? 'border-blue-500' : 'border-gray-100'
-            }`}>
+                <div
+                    className={`p-3 rounded-md border-2 ${
+                        selected ? "border-blue-500" : "border-gray-100"
+                    } `}
+                >
                     {/* Render target handles (inputs) */}
                     {handles.targets.map((h, idx) =>
                         renderHandle(h, id, idx, handles),
@@ -170,29 +171,22 @@ export function createNode(config) {
         };
 
         return (
-            <div style={finalStyle} className={`w-64 bg-white rounded-lg border-2 shadow-sm p-4 text-sm ${
-                selected ? 'border-blue-500' : 'border-gray-200'
-            }`}>
+            <div
+                
+                className={`p-3 bg-white rounded-md border-2 ${
+                    selected ? "border-blue-500" : "border-gray-100"
+                } ${width || "w-64"} ${height || "h-auto"}`}
+            >
                 {/* Render target handles (inputs) */}
                 {handles.targets.map((h, idx) =>
                     renderHandle(h, id, idx, handles),
                 )}
 
                 {/* Node header/label */}
-                <div
-                    style={{
-                        fontWeight: "bold",
-                        marginBottom: "6px",
-                        fontSize: "12px",
-                    }}
-                >
-                    {label}
-                </div>
+                <div className="font-bold mb-1.5 text-xs">{label}</div>
 
                 {/* Render fields */}
-                <div style={{ fontSize: "11px" }}>
-                    {fields.map(renderField)}
-                </div>
+                <div className="text-xs">{fields.map(renderField)}</div>
 
                 {/* Render source handles (outputs) */}
                 {handles.sources.map((h, idx) =>
