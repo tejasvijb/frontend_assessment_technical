@@ -9,11 +9,11 @@ const textNodeConfig = {
     type: "text",
     label: "Text",
     handles: {
-        targets: [],
+        targets: [createHandle("textArea", "left")],
         sources: [createHandle("output", "right")],
     },
     fields: [
-        createField("TextAreaField", "text", "Text", "{{input}}", null, { rows: 2 }),
+        createField("TextAreaField", "value", "Text", "", null, { rows: 2 }),
     ],
     fieldComponents: FieldComponents,
     color: "text",

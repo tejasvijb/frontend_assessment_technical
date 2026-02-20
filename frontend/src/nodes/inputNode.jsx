@@ -88,7 +88,7 @@ const inputNodeConfig = {
         sources: [createHandle("value", "right")],
     },
     fields: [
-        createField("TextField", "name", "Name", ""),
+        createField("TextField", "value", "Name", ""),
         createField("SelectField", "inputType", "Type", "Text", [
             { value: "Text", label: "Text" },
             { value: "File", label: "File" },

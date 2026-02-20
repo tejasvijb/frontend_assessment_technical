@@ -72,7 +72,7 @@ const PipelineUIInner = () => {
     );
 
     const getInitNodeData = (nodeID, type) => {
-        let nodeData = { id: nodeID, nodeType: `${type}`, name: nodeID };
+        let nodeData = { id: nodeID, nodeType: `${type}`, value: nodeID };
         return nodeData;
     };
 
