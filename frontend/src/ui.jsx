@@ -2,7 +2,7 @@
 // Displays the drag-and-drop UI
 // --------------------------------------------------
 
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useMemo } from "react";
 import {
     ReactFlow,
     Background,
@@ -26,7 +26,9 @@ import "@xyflow/react/dist/style.css";
 
 const gridSize = 20;
 const proOptions = { hideAttribution: true };
-const nodeTypes = {
+
+// Memoized node types to prevent recreation on each render
+const NODE_TYPES = {
     customInput: InputNode,
     llm: LLMNode,
     customOutput: OutputNode,
@@ -64,7 +66,7 @@ const PipelineUIInner = () => {
             setEdges((eds) => {
                 const newEdges = [
                     ...eds,
-                    { ...connection, type: "smoothstep", animated: true },
+                    { ...connection, type: "smoothstep", animated: true, key: `${connection.source}-${connection.sourceHandle}-${connection.target}-${connection.targetHandle}` },
                 ];
                 return newEdges;
             });
@@ -98,7 +100,7 @@ const PipelineUIInner = () => {
                 });
 
                 const nodeID = getNodeID(type);
-                console.log(nodeID)
+                console.log(nodeID);
                 const newNode = {
                     id: nodeID,
                     type,
@@ -131,7 +133,7 @@ const PipelineUIInner = () => {
                     onConnect={onConnect}
                     onDrop={onDrop}
                     onDragOver={onDragOver}
-                    nodeTypes={nodeTypes}
+                    nodeTypes={NODE_TYPES}
                     proOptions={proOptions}
                     snapGrid={[gridSize, gridSize]}
                     connectionLineType="smoothstep"

@@ -41,7 +41,10 @@ export function createNode(config) {
         fieldComponents = {},
         styling = {},
         color = "input",
+        customComponent: CustomComponent = null,
         updateStore = null,
+        width = null,
+        height = null,
     } = config;
 
     const finalStyle = {
@@ -51,7 +54,7 @@ export function createNode(config) {
         ...styling,
     };
 
-    return function NodeComponent({ id, data }) {
+    const NodeComponent = ({ id, data, selected }) => {
         // Initialize state from data or use defaults
         const [fieldValues, setFieldValues] = useState(() => {
             const initial = {};
@@ -73,6 +76,65 @@ export function createNode(config) {
                 updateStore(id, fieldName, newValue);
             }
         };
+
+        // Render handle
+        const renderHandle = (handleConfig, nodeId, index, handlesList) => {
+            const position =
+                handleConfig.position === "left"
+                    ? Position.Left
+                    : handleConfig.position === "right"
+                      ? Position.Right
+                      : handleConfig.position === "top"
+                        ? Position.Top
+                        : Position.Bottom;
+
+            const handleType = handlesList.targets.includes(handleConfig)
+                ? "target"
+                : "source";
+            const style = handleConfig.top ? { top: handleConfig.top } : {};
+
+            return (
+                <Handle
+                    key={`${nodeId}-${handleConfig.id}`}
+                    type={handleType}
+                    position={position}
+                    id={`${nodeId}-${handleConfig.id}`}
+                    style={style}
+                />
+            );
+        };
+
+        // If custom component provided, use it
+        if (CustomComponent) {
+            return (
+                <div
+                    className={`p-3 rounded-md border-2 ${
+                        selected ? "border-blue-500" : "border-gray-100"
+                    } `}
+                >
+                    {/* Render target handles (inputs) */}
+                    {handles.targets.map((h, idx) =>
+                        renderHandle(h, id, idx, handles),
+                    )}
+
+                    {/* Custom component */}
+                    <CustomComponent
+                        id={id}
+                        data={data}
+                        fields={fields}
+                        fieldValues={fieldValues}
+                        handleFieldChange={handleFieldChange}
+                        fieldComponents={fieldComponents}
+                        selected={selected}
+                    />
+
+                    {/* Render source handles (outputs) */}
+                    {handles.sources.map((h, idx) =>
+                        renderHandle(h, id, idx, handles),
+                    )}
+                </div>
+            );
+        }
 
         // Render a single field based on its type
         const renderField = (field) => {
@@ -108,62 +170,35 @@ export function createNode(config) {
             );
         };
 
-        // Render handle
-        const renderHandle = (handleConfig, index) => {
-            const position =
-                handleConfig.position === "left"
-                    ? Position.Left
-                    : handleConfig.position === "right"
-                      ? Position.Right
-                      : handleConfig.position === "top"
-                        ? Position.Top
-                        : Position.Bottom;
-
-            const handleType = handles.targets.includes(handleConfig)
-                ? "target"
-                : "source";
-            const style = {};
-            if (handleConfig.top) {
-                style.top = handleConfig.top;
-            }
-
-            return (
-                <Handle
-                    key={`${id}-${handleConfig.id}`}
-                    type={handleType}
-                    position={position}
-                    id={`${id}-${handleConfig.id}`}
-                    style={style}
-                />
-            );
-        };
-
         return (
-            <div style={finalStyle}>
+            <div
+                
+                className={`p-3 bg-white rounded-md border-2 ${
+                    selected ? "border-blue-500" : "border-gray-100"
+                } ${width || "w-64"} ${height || "h-auto"}`}
+            >
                 {/* Render target handles (inputs) */}
-                {handles.targets.map((h, idx) => renderHandle(h, idx))}
+                {handles.targets.map((h, idx) =>
+                    renderHandle(h, id, idx, handles),
+                )}
 
                 {/* Node header/label */}
-                <div
-                    style={{
-                        fontWeight: "bold",
-                        marginBottom: "6px",
-                        fontSize: "12px",
-                    }}
-                >
-                    {label}
-                </div>
+                <div className="font-bold mb-1.5 text-xs">{label}</div>
 
                 {/* Render fields */}
-                <div style={{ fontSize: "11px" }}>
-                    {fields.map(renderField)}
-                </div>
+                <div className="text-xs">{fields.map(renderField)}</div>
 
                 {/* Render source handles (outputs) */}
-                {handles.sources.map((h, idx) => renderHandle(h, idx))}
+                {handles.sources.map((h, idx) =>
+                    renderHandle(h, id, idx, handles),
+                )}
             </div>
         );
     };
+
+    NodeComponent.displayName = `Node(${label})`;
+
+    return React.memo(NodeComponent);
 }
 
 /**

@@ -17,6 +17,8 @@ const llmNodeConfig = {
     fields: [],
     fieldComponents: FieldComponents,
     color: "llm",
+    width: "w-64",
+    height: "h-40"
 };
 
 export const LLMNode = createNode(llmNodeConfig);
