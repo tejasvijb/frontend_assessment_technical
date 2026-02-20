@@ -60,8 +60,8 @@ const PipelineUIInner = () => {
     const nodes = useWorkflowStore((state) => state.nodes);
     const edges = useWorkflowStore((state) => state.edges);
 
-    console.log("nodes, edges", nodes, edges)
-    console.log("selectedNode", selectedNode)
+    console.log("nodes, edges", nodes, edges);
+    console.log("selectedNode", selectedNode);
 
     const onConnect = useCallback(
         (params) => {
