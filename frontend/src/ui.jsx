@@ -26,7 +26,6 @@ import { useShallow } from "zustand/shallow";
 import "@xyflow/react/dist/style.css";
 
 const gridSize = 20;
-const proOptions = { hideAttribution: true };
 
 // Memoized node types to prevent recreation on each render
 const NODE_TYPES = {
@@ -124,7 +123,6 @@ const PipelineUIInner = () => {
                     onDrop={onDrop}
                     onDragOver={onDragOver}
                     nodeTypes={NODE_TYPES}
-                    proOptions={proOptions}
                     snapGrid={[gridSize, gridSize]}
                     connectionLineType="smoothstep"
                     fitView
