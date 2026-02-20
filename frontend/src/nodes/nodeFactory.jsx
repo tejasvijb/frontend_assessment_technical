@@ -52,7 +52,7 @@ export function createNode(config) {
         ...styling,
     };
 
-    const NodeComponent = ({ id, data }) => {
+    const NodeComponent = ({ id, data, selected }) => {
         // Initialize state from data or use defaults
         const [fieldValues, setFieldValues] = useState(() => {
             const initial = {};
@@ -108,7 +108,9 @@ export function createNode(config) {
         // If custom component provided, use it
         if (CustomComponent) {
             return (
-                <div>
+                 <div className={`rounded-md border-3 ${
+                selected ? 'border-blue-500' : 'border-gray-100'
+            }`}>
                     {/* Render target handles (inputs) */}
                     {handles.targets.map((h, idx) =>
                         renderHandle(h, id, idx, handles),
@@ -122,6 +124,7 @@ export function createNode(config) {
                         fieldValues={fieldValues}
                         handleFieldChange={handleFieldChange}
                         fieldComponents={fieldComponents}
+                        selected={selected}
                     />
 
                     {/* Render source handles (outputs) */}
@@ -167,7 +170,9 @@ export function createNode(config) {
         };
 
         return (
-            <div style={finalStyle}>
+            <div style={finalStyle} className={`w-64 bg-white rounded-lg border-2 shadow-sm p-4 text-sm ${
+                selected ? 'border-blue-500' : 'border-gray-200'
+            }`}>
                 {/* Render target handles (inputs) */}
                 {handles.targets.map((h, idx) =>
                     renderHandle(h, id, idx, handles),

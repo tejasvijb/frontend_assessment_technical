@@ -11,9 +11,11 @@ console.log(FieldComponents);
 
 // Custom InputNode component with styled design
 const CustomInputNodeComponent = React.memo(
-    ({ id, data, fields, fieldValues, handleFieldChange, fieldComponents }) => {
+    ({ id, data, fields, fieldValues, handleFieldChange, fieldComponents,  }) => {
+
+      
         return (
-            <div className="w-64 bg-white rounded-lg border border-gray-200 shadow-sm p-4 text-sm">
+            <div className={`w-64 bg-white  p-4 text-sm `}>
                 {/* Header */}
                 <div className="flex items-center gap-2 mb-3">
                     <div className="bg-blue-100 p-1.5 rounded">
