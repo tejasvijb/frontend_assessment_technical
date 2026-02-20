@@ -18,8 +18,16 @@ const useWorkflowStore = create((set, get) => ({
 
     // Graph manipulation
     onNodesChange: (changes) => {
+        const updatedNodes = applyNodeChanges(changes, get().nodes);
+
+        // Handle node selection changes
+        const selectedNodes = updatedNodes.filter((node) => node.selected);
+        const newSelectedNode =
+            selectedNodes.length > 0 ? selectedNodes[0] : null;
+
         set({
-            nodes: applyNodeChanges(changes, get().nodes),
+            nodes: updatedNodes,
+            selectedNode: newSelectedNode,
         });
     },
     onEdgesChange: (changes) => {

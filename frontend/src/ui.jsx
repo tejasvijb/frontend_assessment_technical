@@ -2,7 +2,7 @@
 // Displays the drag-and-drop UI
 // --------------------------------------------------
 
-import { useRef, useCallback, useEffect, useMemo } from "react";
+import { useRef, useCallback, useMemo } from "react";
 import {
     ReactFlow,
     Background,
@@ -10,9 +10,7 @@ import {
     MiniMap,
     useReactFlow,
     ReactFlowProvider,
-    useNodesState,
-    useEdgesState,
-    addEdge
+    addEdge,
 } from "@xyflow/react";
 
 import { InputNode } from "./nodes/inputNode";
@@ -40,28 +38,38 @@ const workflowSelector = (state) => ({
     getNodeID: state.getNodeID,
     setNodes: state.setNodes,
     setEdges: state.setEdges,
+    selectedNode: state.selectedNode,
+    setSelectedNode: state.setSelectedNode,
+    onNodesChange: state.onNodesChange,
+    onEdgesChange: state.onEdgesChange,
 });
 
 const PipelineUIInner = () => {
     const reactFlowWrapper = useRef(null);
     const { screenToFlowPosition } = useReactFlow();
-    const [nodes, setNodes, onNodesChange] = useNodesState([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const {
         getNodeID,
         setNodes: setWorkflowNodes,
         setEdges: setWorkflowEdges,
+        selectedNode,
+        setSelectedNode,
+        onNodesChange: handleNodesChange,
+        onEdgesChange: handleEdgesChange,
     } = useWorkflowStore(useShallow(workflowSelector));
 
-    useEffect(() => {
-        setWorkflowNodes(nodes);
-    }, [nodes, setWorkflowNodes]);
+    const nodes = useWorkflowStore((state) => state.nodes);
+    const edges = useWorkflowStore((state) => state.edges);
 
-    useEffect(() => {
-        setWorkflowEdges(edges);
-    }, [edges, setWorkflowEdges]);
+    // console.log("nodes, edges", nodes, edges)
+    // console.log("selectedNode", selectedNode)
 
-    const onConnect = useCallback((params) => setEdges((eds) => addEdge({...params, animated: true}, eds)), []);
+    const onConnect = useCallback(
+        (params) => {
+            const newEdges = addEdge({ ...params, animated: true }, edges);
+            setWorkflowEdges(newEdges);
+        },
+        [edges, setWorkflowEdges],
+    );
 
     const getInitNodeData = (nodeID, type) => {
         let nodeData = { id: nodeID, nodeType: `${type}` };
@@ -97,10 +105,10 @@ const PipelineUIInner = () => {
                     data: getInitNodeData(nodeID, type),
                 };
 
-                setNodes((nds) => nds.concat(newNode));
+                setWorkflowNodes([...nodes, newNode]);
             }
         },
-        [screenToFlowPosition, getNodeID, setNodes],
+        [screenToFlowPosition, getNodeID, setWorkflowNodes, nodes],
     );
 
     const onDragOver = useCallback((event) => {
@@ -117,8 +125,8 @@ const PipelineUIInner = () => {
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
-                    onNodesChange={onNodesChange}
-                    onEdgesChange={onEdgesChange}
+                    onNodesChange={handleNodesChange}
+                    onEdgesChange={handleEdgesChange}
                     onConnect={onConnect}
                     onDrop={onDrop}
                     onDragOver={onDragOver}
