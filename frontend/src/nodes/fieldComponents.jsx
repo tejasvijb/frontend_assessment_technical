@@ -32,7 +32,7 @@ export const TextAreaField = ({ label, value, onChange, rows = 3 }) => (
             value={value}
             onChange={onChange}
             rows={rows}
-            className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md bg-white font-mono focus:outline-none focus:ring-1 focus:ring-blue-300 resize-none"
+            className="w-full px-3 py-2 text-xs border border-gray-300 rounded-md bg-white font-mono focus:outline-none focus:ring-1 focus:ring-blue-300 resize-y"
         />
     </div>
 );

@@ -18,8 +18,16 @@ const useWorkflowStore = create((set, get) => ({
 
     // Graph manipulation
     onNodesChange: (changes) => {
+        const updatedNodes = applyNodeChanges(changes, get().nodes);
+
+        // Handle node selection changes
+        const selectedNodes = updatedNodes.filter((node) => node.selected);
+        const newSelectedNode =
+            selectedNodes.length > 0 ? selectedNodes[0] : null;
+
         set({
-            nodes: applyNodeChanges(changes, get().nodes),
+            nodes: updatedNodes,
+            selectedNode: newSelectedNode,
         });
     },
     onEdgesChange: (changes) => {
@@ -45,7 +53,7 @@ const useWorkflowStore = create((set, get) => ({
         }
         newIDs[type] += 1;
         set({ nodeIDs: newIDs });
-        return `${type}-${newIDs[type]}`;
+        return `${type}_${newIDs[type]}`;
     },
 
     // Add node to graph
@@ -131,20 +139,32 @@ const useWorkflowStore = create((set, get) => ({
 
     // Update node data and persist to store
     updateNodeData: (nodeId, fieldName, fieldValue) => {
-        set({
-            nodes: get().nodes.map((node) => {
-                if (node.id === nodeId) {
-                    return {
-                        ...node,
-                        data: {
-                            ...node.data,
-                            [fieldName]: fieldValue,
-                        },
-                    };
-                }
-                return node;
-            }),
+        const updatedNodes = get().nodes.map((node) => {
+            if (node.id === nodeId) {
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        [fieldName]: fieldValue,
+                    },
+                };
+            }
+            return node;
         });
+
+        const updatedNode = updatedNodes.find((node) => node.id === nodeId);
+        const newState = { nodes: updatedNodes };
+
+        // Update selectedNode if it's the node being updated
+        if (
+            get().selectedNode &&
+            get().selectedNode.id === nodeId &&
+            updatedNode
+        ) {
+            newState.selectedNode = updatedNode;
+        }
+
+        set(newState);
     },
 }));
 

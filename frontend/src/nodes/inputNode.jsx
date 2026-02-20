@@ -11,9 +11,7 @@ console.log(FieldComponents);
 
 // Custom InputNode component with styled design
 const CustomInputNodeComponent = React.memo(
-    ({ id, data, fields, fieldValues, handleFieldChange, fieldComponents,  }) => {
-
-      
+    ({ id, data, fields, fieldValues, handleFieldChange, fieldComponents }) => {
         return (
             <div className={`w-64 bg-white  p-4 text-sm `}>
                 {/* Header */}
@@ -90,7 +88,7 @@ const inputNodeConfig = {
         sources: [createHandle("value", "right")],
     },
     fields: [
-        createField("TextField", "inputName", "Name", "input_0"),
+        createField("TextField", "value", "Name", ""),
         createField("SelectField", "inputType", "Type", "Text", [
             { value: "Text", label: "Text" },
             { value: "File", label: "File" },
