@@ -12,6 +12,7 @@ import {
     ReactFlowProvider,
     useNodesState,
     useEdgesState,
+    addEdge
 } from "@xyflow/react";
 
 import { InputNode } from "./nodes/inputNode";
@@ -61,18 +62,7 @@ const PipelineUIInner = () => {
         setWorkflowEdges(edges);
     }, [edges, setWorkflowEdges]);
 
-    const onConnect = useCallback(
-        (connection) => {
-            setEdges((eds) => {
-                const newEdges = [
-                    ...eds,
-                    { ...connection, type: "smoothstep", animated: true, key: `${connection.source}-${connection.sourceHandle}-${connection.target}-${connection.targetHandle}` },
-                ];
-                return newEdges;
-            });
-        },
-        [setEdges],
-    );
+    const onConnect = useCallback((params) => setEdges((eds) => addEdge({...params, animated: true}, eds)), []);
 
     const getInitNodeData = (nodeID, type) => {
         let nodeData = { id: nodeID, nodeType: `${type}` };

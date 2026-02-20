@@ -91,7 +91,11 @@ export function createNode(config) {
             const handleType = handlesList.targets.includes(handleConfig)
                 ? "target"
                 : "source";
-            const style = handleConfig.top ? { top: handleConfig.top } : {};
+            const style = {
+                ...(handleConfig.top ? { top: handleConfig.top } : {}),
+                width: "16px",
+                height: "16px",
+            };
 
             return (
                 <Handle
