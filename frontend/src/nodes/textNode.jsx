@@ -26,6 +26,8 @@ import useWorkflowStore from "../store/workflowStore";
 import { Portal } from "./slateUtils/Portal";
 import { IS_MAC } from "./slateUtils/environment";
 import { Type } from "lucide-react";
+import { addEdge } from "@xyflow/react";
+
 
 // Sample variable suggestions for text insertions
 // const VARIABLE_SUGGESTIONS = [
@@ -57,6 +59,9 @@ const CustomTextNodeComponent = React.memo(
         const [search, setSearch] = useState("");
 
         const nodes = useWorkflowStore((state) => state.nodes);
+        const edges = useWorkflowStore((state) => state.edges);
+        const selectedNode = useWorkflowStore((state) => state.selectedNode);
+        const setWorkflowEdges = useWorkflowStore((state) => state.setEdges);
 
         const customInputnodes = useMemo(
             () => nodes.filter((n) => n.type === "customInput"),
@@ -90,6 +95,51 @@ const CustomTextNodeComponent = React.memo(
             .filter((c) => c.toLowerCase().startsWith(search.toLowerCase()))
             .slice(0, 8);
 
+        const addNewEdge = (suggestion) => {
+            const sourceNode = nodes.find((n) => n.data?.value === suggestion);
+            const targetNode = selectedNode;
+            if (!sourceNode || !targetNode) return;
+
+            const source = sourceNode.id;
+            const target = targetNode.id;
+            const sourceHandleId = sourceNode.data.handles.sources[0]?.id || null; // Assuming first handle is the output
+            const targetHandleId = targetNode.data.handles.targets[0]?.id || null; // Assuming first handle is the input
+            
+            const sourceHandle = `${source}-${sourceHandleId}`;
+            const targetHandle = `${target}-${targetHandleId}`;
+
+            const edgeId = `xy-edge__${source}${sourceHandle}-${target}${targetHandle}`;
+
+            const newEdge = {
+              animated: true,
+              id: edgeId,
+              source,
+              sourceHandle,
+              target,
+              targetHandle,
+            }
+
+            // check if edge already exists
+            const edgeExists = edges.some((e) => e.id === edgeId);
+            if (edgeExists) return;
+            
+
+            const newEdges = addEdge(newEdge, edges);
+            setWorkflowEdges(newEdges);
+
+        }
+
+        // Handle mention selection from dropdown or keyboard
+        const handleMentionSelection = useCallback(
+            (suggestion) => {
+                Transforms.select(editor, target);
+                insertMention(editor, suggestion);
+                addNewEdge(suggestion);
+                setTarget(null);
+            },
+            [editor, target],
+        );
+
         // Handle keyboard navigation in dropdown
         const onKeyDown = useCallback(
             (event) => {
@@ -110,9 +160,7 @@ const CustomTextNodeComponent = React.memo(
                         case "Tab":
                         case "Enter":
                             event.preventDefault();
-                            Transforms.select(editor, target);
-                            insertMention(editor, suggestions[index]);
-                            setTarget(null);
+                            handleMentionSelection(suggestions[index]);
                             break;
                         case "Escape":
                             event.preventDefault();
@@ -123,7 +171,7 @@ const CustomTextNodeComponent = React.memo(
                     }
                 }
             },
-            [suggestions, editor, index, target],
+            [suggestions, editor, index, target, handleMentionSelection],
         );
 
         // Position the mention dropdown
@@ -277,11 +325,9 @@ const CustomTextNodeComponent = React.memo(
                                 {suggestions.map((suggestion, i) => (
                                     <div
                                         key={suggestion}
-                                        onClick={() => {
-                                            Transforms.select(editor, target);
-                                            insertMention(editor, suggestion);
-                                            setTarget(null);
-                                        }}
+                                        onClick={() =>
+                                            handleMentionSelection(suggestion)
+                                        }
                                         style={{
                                             padding: "8px 10px",
                                             borderRadius: "4px",
