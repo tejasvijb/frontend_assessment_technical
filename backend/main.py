@@ -1,8 +1,21 @@
 from fastapi import FastAPI
 from typing import List, Dict, Any
 from pydantic import BaseModel
+import os
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+cors_options = {
+    "allow_origins": os.getenv("FRONTEND_URL", "http://localhost:5173").split(","),
+    "allow_credentials": True,
+    "allow_methods": ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization", "Cookie"],
+}
+
+# Add CORS middleware
+app.add_middleware(CORSMiddleware, **cors_options)
 
 class Node(BaseModel):
     id: str
