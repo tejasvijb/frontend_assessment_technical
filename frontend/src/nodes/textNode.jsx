@@ -9,7 +9,7 @@ import React, {
     useRef,
     useState,
 } from "react";
-import { Editor, Transforms, Range, createEditor } from "slate";
+import { Editor, Transforms, Range, createEditor, node } from "slate";
 import { withHistory } from "slate-history";
 import {
     Editable,
@@ -27,16 +27,16 @@ import { IS_MAC } from "./slateUtils/environment";
 import { Type } from "lucide-react";
 
 // Sample variable suggestions for text insertions
-const VARIABLE_SUGGESTIONS = [
-    "firstName",
-    "lastName",
-    "email",
-    "phoneNumber",
-    "address",
-    "companyName",
-    "jobTitle",
-    "department",
-];
+// const VARIABLE_SUGGESTIONS = [
+//     "firstName",
+//     "lastName",
+//     "email",
+//     "phoneNumber",
+//     "address",
+//     "companyName",
+//     "jobTitle",
+//     "department",
+// ];
 
 // Custom Text Node Component
 const CustomTextNodeComponent = React.memo(
@@ -55,6 +55,24 @@ const CustomTextNodeComponent = React.memo(
         const [index, setIndex] = useState(0);
         const [search, setSearch] = useState("");
 
+        const nodes = useWorkflowStore((state) => state.nodes);
+
+        const customInputnodes = useMemo(
+            () => nodes.filter((n) => n.type === "customInput"),
+            [nodes],
+        );
+
+        const customInputValues = useMemo(
+            () =>
+                customInputnodes.reduce((values, node) => {
+                    values.push(node.data?.value || node.id);
+                    return values;
+                }, []),
+            [customInputnodes],
+        );
+
+        
+
         const renderElement = useCallback(
             (props) => <Element {...props} />,
             [],
@@ -67,7 +85,7 @@ const CustomTextNodeComponent = React.memo(
         );
 
         // Get filtered suggestions
-        const suggestions = VARIABLE_SUGGESTIONS.filter((c) =>
+        const suggestions = customInputValues.filter((c) =>
             c.toLowerCase().startsWith(search.toLowerCase()),
         ).slice(0, 8);
 
@@ -386,6 +404,7 @@ const insertMention = (editor, character) => {
         character,
         children: [{ text: "" }],
     };
+    console.log("mention", mention);
     Transforms.insertNodes(editor, mention);
     Transforms.move(editor);
 };
