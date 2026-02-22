@@ -12,6 +12,14 @@ A visual workflow pipeline builder application that allows users to create and d
 - **Workflow Validation**: Backend validation ensures workflows form valid Directed Acyclic Graphs (DAGs)
 - **Real-time Processing**: Submit workflows for execution and processing
 
+## Walkthrough
+
+Watch a comprehensive walkthrough of the Workflow Pipeline Builder in action:
+
+[![Loom Video Walkthrough](https://cdn.loom.com/sessions/thumbnails/e8319324e4564718a920edbfe553ee77-with-play.jpg)](https://www.loom.com/share/e8319324e4564718a920edbfe553ee77)
+
+[View Full Video](https://www.loom.com/share/e8319324e4564718a920edbfe553ee77)
+
 ## Screenshots
 
 ![Workflow Builder](./images/image1.png)
