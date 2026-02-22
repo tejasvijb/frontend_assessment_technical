@@ -19,8 +19,9 @@ import {
     useSelected,
     withReact,
 } from "slate-react";
-import { createNode, createHandle, createField } from "./nodeFactory";
+import { createNode, createField } from "./nodeFactory";
 import * as FieldComponents from "./fieldComponents";
+import { NODE_HANDLES } from "./handles";
 import useWorkflowStore from "../store/workflowStore";
 import { Portal } from "./slateUtils/Portal";
 import { IS_MAC } from "./slateUtils/environment";
@@ -62,6 +63,8 @@ const CustomTextNodeComponent = React.memo(
             [nodes],
         );
 
+        // console.log('customInputNodes', customInputnodes)
+
         const customInputValues = useMemo(
             () =>
                 customInputnodes.reduce((values, node) => {
@@ -70,8 +73,6 @@ const CustomTextNodeComponent = React.memo(
                 }, []),
             [customInputnodes],
         );
-
-        
 
         const renderElement = useCallback(
             (props) => <Element {...props} />,
@@ -85,9 +86,9 @@ const CustomTextNodeComponent = React.memo(
         );
 
         // Get filtered suggestions
-        const suggestions = customInputValues.filter((c) =>
-            c.toLowerCase().startsWith(search.toLowerCase()),
-        ).slice(0, 8);
+        const suggestions = customInputValues
+            .filter((c) => c.toLowerCase().startsWith(search.toLowerCase()))
+            .slice(0, 8);
 
         // Handle keyboard navigation in dropdown
         const onKeyDown = useCallback(
@@ -413,10 +414,7 @@ const insertMention = (editor, character) => {
 const textNodeConfig = {
     type: "text",
     label: "Text",
-    handles: {
-        targets: [createHandle("textArea", "left")],
-        sources: [createHandle("output", "right")],
-    },
+    handles: NODE_HANDLES.text,
     fieldComponents: FieldComponents,
     color: "text",
     customComponent: CustomTextNodeComponent,

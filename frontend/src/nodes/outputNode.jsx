@@ -1,17 +1,15 @@
 // outputNode.js
 // Output node created with the factory pattern
 
-import { createNode, createHandle, createField } from "./nodeFactory";
+import { createNode, createField } from "./nodeFactory";
 import * as FieldComponents from "./fieldComponents";
 import useWorkflowStore from "../store/workflowStore";
+import { NODE_HANDLES } from "./handles";
 
 const outputNodeConfig = {
     type: "customOutput",
     label: "Output",
-    handles: {
-        targets: [createHandle("value", "left")],
-        sources: [],
-    },
+    handles: NODE_HANDLES.customOutput,
     fields: [
         createField("TextField", "outputName", "Name", "output_1"),
         createField("SelectField", "outputType", "Type", "Text", [
