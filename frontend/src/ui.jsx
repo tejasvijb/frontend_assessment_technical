@@ -20,6 +20,7 @@ import { TextNode } from "./nodes/textNode";
 import { ImagePreviewNode } from "./nodes/imagePreviewNode";
 import useWorkflowStore from "./store/workflowStore";
 import { useShallow } from "zustand/shallow";
+import { NODE_HANDLES } from "./nodes/handles";
 
 import "@xyflow/react/dist/style.css";
 
@@ -72,7 +73,7 @@ const PipelineUIInner = () => {
     );
 
     const getInitNodeData = (nodeID, type) => {
-        let nodeData = { id: nodeID, nodeType: `${type}`, value: nodeID };
+        let nodeData = { id: nodeID, nodeType: `${type}`, value: nodeID, handles: NODE_HANDLES[type] || [] };
         return nodeData;
     };
 

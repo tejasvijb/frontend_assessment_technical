@@ -1,11 +1,12 @@
 // inputNode.js
 // Input node created with the factory pattern
 
-import { createNode, createHandle, createField } from "./nodeFactory";
+import { createNode, createField } from "./nodeFactory";
 import * as FieldComponents from "./fieldComponents";
 import useWorkflowStore from "../store/workflowStore";
 import { Zap, Settings, Lightbulb } from "lucide-react";
 import React from "react";
+import { NODE_HANDLES } from "./handles";
 
 console.log(FieldComponents);
 
@@ -83,10 +84,7 @@ const CustomInputNodeComponent = React.memo(
 const inputNodeConfig = {
     type: "customInput",
     label: "Input",
-    handles: {
-        targets: [],
-        sources: [createHandle("value", "right")],
-    },
+    handles: NODE_HANDLES.customInput,
     fields: [
         createField("TextField", "value", "Name", ""),
         createField("SelectField", "inputType", "Type", "Text", [

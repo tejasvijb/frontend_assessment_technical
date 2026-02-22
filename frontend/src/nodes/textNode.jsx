@@ -9,7 +9,7 @@ import React, {
     useRef,
     useState,
 } from "react";
-import { Editor, Transforms, Range, createEditor } from "slate";
+import { Editor, Transforms, Range, createEditor, node } from "slate";
 import { withHistory } from "slate-history";
 import {
     Editable,
@@ -19,32 +19,60 @@ import {
     useSelected,
     withReact,
 } from "slate-react";
-import { createNode, createHandle, createField } from "./nodeFactory";
+import { createNode, createField } from "./nodeFactory";
 import * as FieldComponents from "./fieldComponents";
+import { NODE_HANDLES } from "./handles";
 import useWorkflowStore from "../store/workflowStore";
 import { Portal } from "./slateUtils/Portal";
 import { IS_MAC } from "./slateUtils/environment";
 import { Type } from "lucide-react";
 
 // Sample variable suggestions for text insertions
-const VARIABLE_SUGGESTIONS = [
-    "firstName",
-    "lastName",
-    "email",
-    "phoneNumber",
-    "address",
-    "companyName",
-    "jobTitle",
-    "department",
-];
+// const VARIABLE_SUGGESTIONS = [
+//     "firstName",
+//     "lastName",
+//     "email",
+//     "phoneNumber",
+//     "address",
+//     "companyName",
+//     "jobTitle",
+//     "department",
+// ];
 
 // Custom Text Node Component
 const CustomTextNodeComponent = React.memo(
-    ({ id, data, fields, fieldValues, handleFieldChange, fieldComponents }) => {
+    ({
+        id,
+        data,
+        fields,
+        fieldValues,
+        handleFieldChange,
+        fieldComponents,
+        selected,
+    }) => {
         const editorRef = useRef(null);
+        const editableRef = useRef(null);
         const [target, setTarget] = useState(null);
         const [index, setIndex] = useState(0);
         const [search, setSearch] = useState("");
+
+        const nodes = useWorkflowStore((state) => state.nodes);
+
+        const customInputnodes = useMemo(
+            () => nodes.filter((n) => n.type === "customInput"),
+            [nodes],
+        );
+
+        // console.log('customInputNodes', customInputnodes)
+
+        const customInputValues = useMemo(
+            () =>
+                customInputnodes.reduce((values, node) => {
+                    values.push(node.data?.value || node.id);
+                    return values;
+                }, []),
+            [customInputnodes],
+        );
 
         const renderElement = useCallback(
             (props) => <Element {...props} />,
@@ -58,9 +86,9 @@ const CustomTextNodeComponent = React.memo(
         );
 
         // Get filtered suggestions
-        const suggestions = VARIABLE_SUGGESTIONS.filter((c) =>
-            c.toLowerCase().startsWith(search.toLowerCase()),
-        ).slice(0, 8);
+        const suggestions = customInputValues
+            .filter((c) => c.toLowerCase().startsWith(search.toLowerCase()))
+            .slice(0, 8);
 
         // Handle keyboard navigation in dropdown
         const onKeyDown = useCallback(
@@ -109,8 +137,20 @@ const CustomTextNodeComponent = React.memo(
             }
         }, [suggestions.length, editor, index, search, target]);
 
+        // Auto-focus editor when node is selected
+        useEffect(() => {
+            if (selected && editableRef.current) {
+                // Use a small timeout to ensure DOM is ready
+                const timeoutId = setTimeout(() => {
+                    ReactEditor.focus(editor);
+                    editableRef.current?.focus();
+                }, 0);
+                return () => clearTimeout(timeoutId);
+            }
+        }, [selected, editor]);
+
         // Handle editor content change
-        const handleEditorChange = () => {
+        const handleEditorChange = useCallback(() => {
             const { selection } = editor;
             if (selection && Range.isCollapsed(selection)) {
                 const [start] = Range.edges(selection);
@@ -152,7 +192,7 @@ const CustomTextNodeComponent = React.memo(
                 }
             }
             setTarget(null);
-        };
+        }, [editor]);
 
         // Initialize editor value from store data or empty
         const initialValue = useMemo(() => {
@@ -200,6 +240,7 @@ const CustomTextNodeComponent = React.memo(
                 >
                     <div className="border border-gray-300 rounded p-2 bg-gray-50 min-h-24 focus-within:border-blue-500 focus-within:shadow-md transition">
                         <Editable
+                            ref={editableRef}
                             renderElement={renderElement}
                             renderLeaf={renderLeaf}
                             onKeyDown={onKeyDown}
@@ -364,6 +405,7 @@ const insertMention = (editor, character) => {
         character,
         children: [{ text: "" }],
     };
+    console.log("mention", mention);
     Transforms.insertNodes(editor, mention);
     Transforms.move(editor);
 };
@@ -372,11 +414,7 @@ const insertMention = (editor, character) => {
 const textNodeConfig = {
     type: "text",
     label: "Text",
-    handles: {
-        targets: [createHandle("textArea", "left")],
-        sources: [createHandle("output", "right")],
-    },
-    fields: [createField("TextField", "value", "Text", "")],
+    handles: NODE_HANDLES.text,
     fieldComponents: FieldComponents,
     color: "text",
     customComponent: CustomTextNodeComponent,

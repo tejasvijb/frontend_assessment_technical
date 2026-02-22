@@ -2,8 +2,9 @@
 // Image Preview node - demonstrates rich content rendering
 
 import React, { useState } from "react";
-import { createNode, createHandle } from "./nodeFactory";
+import { createNode } from "./nodeFactory";
 import { Image } from "lucide-react";
+import { NODE_HANDLES } from "./handles";
 
 // Custom ImagePreviewNode component with styled design
 const CustomImagePreviewNodeComponent = React.memo(({ id, data }) => {
@@ -57,10 +58,7 @@ const CustomImagePreviewNodeComponent = React.memo(({ id, data }) => {
 const imageNodeConfig = {
     type: "imagePreview",
     label: "Image Preview",
-    handles: {
-        targets: [createHandle("image", "left")],
-        sources: [createHandle("output", "right")],
-    },
+    handles: NODE_HANDLES.imagePreview,
     fields: [],
     fieldComponents: {},
     color: "image",
